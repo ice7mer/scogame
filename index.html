@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>سكوب اﻷلعاب</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background-color: #f4f7f6; padding: 20px; }
+        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
+        #number-display { font-size: 70px; color: #e74c3c; margin: 20px 0; height: 90px; border: 2px dashed #ddd; line-height: 90px; }
+        select, button { padding: 12px 25px; font-size: 18px; border-radius: 8px; border: 1px solid #ddd; margin: 10px; cursor: pointer; }
+        button { background-color: #27ae60; color: white; border: none; transition: 0.3s; }
+        button:hover { background-color: #219150; }
+        .product-result { display: none; margin-top: 20px; border-top: 2px solid #eee; padding-top: 20px; }
+        img { max-width: 250px; border-radius: 10px; margin: 15px 0; }
+        .buy-btn { display: inline-block; background: #2980b9; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🎯سكوب اﻷلعاب </h1>
+    
+    <label>اختر القسم:</label>
+    <select id="category-select">
+        <option value="الكل">جارٍ تحميل الأقسام...</option>
+    </select>
+    <div id="product-result" class="product-result">
+        <h2 id="p-name"></h2>
+        <img id="p-image" src="">
+        <br>
+        <a id="p-link" class="buy-btn" href="#" target="_blank">رابط اللعبة </a>
+    </div>
+    <div id="number-display">---</div>
+
+    <button onclick="startScoop()">إبدأ السكوب!</button>
+
+    
+</div>
+
+<script>
+    let allProducts = [];
+
+    // استبدل "products.csv" برابط جوجل شيت الخاص بك
+Papa.parse("https://docs.google.com/spreadsheets/d/e/2PACX-1vSw87IsGoLaeGQJkF2KWvc7PI4LSe8AV7pXflgEZl_YOGZtRZdwLxoZPGGEwt5tiygaxeoTWHD6bbRv/pub?output=csv", {
+    download: true,
+    header: true,
+    complete: function(results) {
+        allProducts = results.data;
+        fillCategories();
+    }
+});
+
+    // 2. استخراج الأقسام من الملف ووضعها في القائمة تلقائياً
+    function fillCategories() {
+        const select = document.getElementById('category-select');
+        const categories = [...new Set(allProducts.map(p => p.Category))];
+        
+        select.innerHTML = '<option value="الكل">كل الأنواع</option>';
+        categories.forEach(cat => {
+            if(cat) select.innerHTML += `<option value="${cat}">${cat}</option>`;
+        });
+    }
+
+    // 3. وظيفة السكوب
+    function startScoop() {
+        const category = document.getElementById('category-select').value;
+        const filtered = category === "الكل" ? allProducts : allProducts.filter(p => p.Category === category);
+
+        if(filtered.length === 0) return alert("لا توجد منتجات!");
+
+        let count = 0;
+        const timer = setInterval(() => {
+            document.getElementById('number-display').innerText = Math.floor(Math.random() * 999);
+            count++;
+            if(count > 20) {
+                clearInterval(timer);
+                showFinal(filtered);
+            }
+        }, 50);
+    }
+
+    // 4. عرض المنتج النهائي
+    function showFinal(list) {
+        const product = list[Math.floor(Math.random() * list.length)];
+        document.getElementById('number-display').innerText = product.ID;
+        document.getElementById('p-name').innerText = product.Name;
+        document.getElementById('p-image').src = product.Image_URL;
+        document.getElementById('p-link').href = product.Affiliate_Link;
+        document.getElementById('product-result').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
