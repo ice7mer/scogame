@@ -116,6 +116,17 @@ header p{margin:18px 0 0;font-size:18px;font-weight:500}
   let currentCategory = "الكل";
   const $ = id => document.getElementById(id);
 
+  // الصورة الافتراضية للألعاب بلا صورة (لتغييرها: ضع رابط صورتك بدل السطر التالي، مثل 'https://.../default.png')
+  const DEFAULT_IMAGE = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">' +
+    '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a86ff"/><stop offset="1" stop-color="#2ec4a6"/></linearGradient>' +
+    '<pattern id="d" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="2" fill="#fff" fill-opacity=".25"/></pattern></defs>' +
+    '<rect width="400" height="300" fill="url(#g)"/><rect width="400" height="300" fill="url(#d)"/>' +
+    '<g transform="translate(200 150)" stroke="#1b1f3b" stroke-width="6" stroke-linejoin="round">' +
+    '<path d="M-95 -35Q-95 -55 -70 -55H70Q95 -55 95 -35L115 40Q120 70 90 70Q70 70 55 45H-55Q-70 70 -90 70Q-120 70 -115 40Z" fill="#ffc83d"/>' +
+    '<path d="M-70 -20h14v-14h14v14h14v14h-14v14h-14v-14h-14z" fill="#1b1f3b" stroke="none"/>' +
+    '<circle cx="55" cy="-22" r="10" fill="#ff5a5f"/><circle cx="80" cy="0" r="10" fill="#ff5a5f"/></g></svg>');
+
   // ===== التقييم المشترك =====
   // ضع هنا رابط تطبيق الويب (Web app URL) من Apps Script. اتركه فارغاً لإخفاء التقييم.
   const RATINGS_URL = 'https://script.google.com/macros/s/AKfycbyRaVsBX-aN2EH3KpQIErWGqAA2qnsj0jqMsbZIUGS26f_CDjp0c_z0rTp9DTRERirb/exec';
@@ -243,7 +254,9 @@ header p{margin:18px 0 0;font-size:18px;font-weight:500}
     $('p-cat').style.display = p.Category ? 'inline-block' : 'none';
     const img = $('p-image');
     img.alt = p.Name;
-    img.src = p.Image_URL || '';
+    const hasImage = /^https?:\/\//.test((p.Image_URL || '').trim());
+    img.onerror = () => { img.onerror = null; img.src = DEFAULT_IMAGE; };
+    img.src = hasImage ? p.Image_URL.trim() : DEFAULT_IMAGE;
     $('p-link').href = p.Affiliate_Link || '#';
     renderRating((p.Affiliate_Link || p.Name || '').trim());
     const res = $('product-result');
