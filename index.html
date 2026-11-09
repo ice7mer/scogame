@@ -76,6 +76,31 @@ header p{margin:18px 0 0;font-size:18px;font-weight:500}
 .star:focus-visible{outline:3px solid var(--ink);outline-offset:2px;border-radius:6px}
 .rate-msg{font-size:15px;margin:6px 0 0;min-height:1.4em}
 
+.foot{margin-top:36px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.fbtn{font:inherit;font-weight:700;font-size:15px;padding:9px 18px;border:2.5px solid var(--ink);border-radius:999px;background:var(--white);
+  color:var(--ink);cursor:pointer;text-decoration:none;display:inline-block;transition:transform .12s}
+.fbtn:hover{transform:translateY(-2px)}
+.fbtn[hidden]{display:none}
+.fbtn.dc{background:#5865f2;color:#fff}
+.fbtn.tg{background:#229ed9;color:#fff}
+dialog{border:3px solid var(--ink);border-radius:20px;padding:22px;max-width:92vw;width:420px;font-family:var(--body);
+  color:var(--ink);background:var(--white);box-shadow:8px 8px 0 var(--ink)}
+dialog::backdrop{background:rgba(27,31,59,.55)}
+dialog h3{font-family:var(--display);font-weight:400;font-size:28px;margin:0 0 6px}
+dialog label{display:block;font-weight:700;margin:12px 0 4px}
+dialog input,dialog select,dialog textarea{width:100%;font:inherit;padding:10px;border:2.5px solid var(--ink);border-radius:10px;background:#fff;color:var(--ink)}
+dialog input[readonly]{background:#eee}
+dialog textarea{resize:vertical;min-height:70px}
+.r-name{margin:6px 0 0;font-size:15px;opacity:.8}
+.hp{position:absolute;left:-9999px;height:0;overflow:hidden;opacity:0}
+#cf-box{margin-top:12px}
+.dlg-msg{min-height:1.4em;margin:10px 0 0;font-size:15px;font-weight:500}
+.dlg-actions{display:flex;gap:10px;margin-top:14px}
+.dlg-actions button{flex:1;font:inherit;font-weight:700;font-size:16px;padding:11px;border:3px solid var(--ink);border-radius:12px;cursor:pointer}
+.send{background:var(--coral);color:#fff}
+.send:disabled{opacity:.6;cursor:wait}
+.cancel{background:#fff;color:var(--ink)}
+
 @media (prefers-reduced-motion:reduce){.ball.spin,.result.show{animation:none}}
 </style>
 </head>
@@ -109,7 +134,47 @@ header p{margin:18px 0 0;font-size:18px;font-weight:500}
       <p class="again">لم تعجبك؟ اضغط «ابدأ السكوب» مرة أخرى.</p>
     </div>
   </article>
+<footer class="foot">
+    <button class="fbtn" id="btn-report" type="button">🚩 التبليغ عن لعبة</button>
+    <a class="fbtn dc" id="btn-discord" target="_blank" rel="noopener" hidden>💬 سيرفر ديسكورد</a>
+    <a class="fbtn tg" id="btn-telegram" target="_blank" rel="noopener" hidden>✈️ قناة تلغرام</a>
+  </footer>
 </main>
+
+<dialog id="report-dialog">
+  <form id="report-form">
+    <h3>التبليغ عن لعبة</h3>
+    <label for="r-id">رقم اللعبة</label>
+    <input id="r-id" inputmode="numeric" maxlength="10">
+    <p class="r-name" id="r-name"></p>
+
+    <label for="r-reason">سبب التبليغ</label>
+    <select id="r-reason">
+      <option value="">اختر السبب...</option>
+      <option>قمار أو مراهنات</option>
+      <option>محتوى غير أخلاقي أو غير لائق</option>
+      <option>عنف مبالغ فيه</option>
+      <option>محتوى مسيء أو يحرّض على الكراهية</option>
+      <option>اللعبة لا تعمل أو الرابط خاطئ</option>
+      <option>صورة أو اسم غير مناسب</option>
+      <option>سبب آخر</option>
+    </select>
+
+    <label for="r-note">تفاصيل إضافية (اختياري)</label>
+    <textarea id="r-note" maxlength="300"></textarea>
+
+    <div class="hp" aria-hidden="true"><label for="r-hp">اترك هذا الحقل فارغاً</label><input id="r-hp" tabindex="-1" autocomplete="off"></div>
+
+    <div id="math-box"><label for="r-math" id="math-q"></label><input id="r-math" inputmode="numeric" autocomplete="off"></div>
+    <div id="cf-box"></div>
+
+    <p class="dlg-msg" id="r-msg" role="status"></p>
+    <div class="dlg-actions">
+      <button type="submit" class="send" id="r-send">إرسال البلاغ</button>
+      <button type="button" class="cancel" id="r-cancel">إلغاء</button>
+    </div>
+  </form>
+</dialog>
 
 <script>
   let allProducts = [];
@@ -118,7 +183,7 @@ header p{margin:18px 0 0;font-size:18px;font-weight:500}
 
   // الصورة الافتراضية للألعاب بلا صورة (لتغييرها: ضع رابط صورتك بدل السطر التالي، مثل 'https://.../default.png')
   const DEFAULT_IMAGE = 'data:image/svg+xml;utf8,' + encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">' +
+    '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">' +
     '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a86ff"/><stop offset="1" stop-color="#2ec4a6"/></linearGradient>' +
     '<pattern id="d" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="2" fill="#fff" fill-opacity=".25"/></pattern></defs>' +
     '<rect width="400" height="300" fill="url(#g)"/><rect width="400" height="300" fill="url(#d)"/>' +
@@ -129,7 +194,7 @@ header p{margin:18px 0 0;font-size:18px;font-weight:500}
 
   // ===== التقييم المشترك =====
   // ضع هنا رابط تطبيق الويب (Web app URL) من Apps Script. اتركه فارغاً لإخفاء التقييم.
-  const RATINGS_URL = 'https://script.google.com/macros/s/AKfycbyRaVsBX-aN2EH3KpQIErWGqAA2qnsj0jqMsbZIUGS26f_CDjp0c_z0rTp9DTRERirb/exec';
+  const RATINGS_URL = '';
 
   let ratings = {};      // { مفتاح اللعبة: {sum, count} }
   let currentKey = '';
@@ -255,15 +320,104 @@ header p{margin:18px 0 0;font-size:18px;font-weight:500}
     const img = $('p-image');
     img.alt = p.Name;
     const hasImage = /^https?:\/\//.test((p.Image_URL || '').trim());
-    img.onerror = () => { img.onerror = null; img.src = DEFAULT_IMAGE; };
+    const useDefault = () => { img.onerror = null; img.onload = null; img.src = DEFAULT_IMAGE; };
+    img.onerror = useDefault;
+    img.onload = () => { if (img.naturalWidth < 20 || img.naturalHeight < 20) useDefault(); };  // صورة فارغة/صغيرة جداً
     img.src = hasImage ? p.Image_URL.trim() : DEFAULT_IMAGE;
     $('p-link').href = p.Affiliate_Link || '#';
+    shownGame = p;
     renderRating((p.Affiliate_Link || p.Name || '').trim());
     const res = $('product-result');
     void res.offsetWidth;
     res.classList.add('show');
     res.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
+
+  // ===== التبليغ وروابط المجتمع =====
+  const DISCORD_URL = '';         // رابط دعوة سيرفر ديسكورد
+  const TELEGRAM_URL = '';        // رابط قناة تلغرام، مثل https://t.me/اسم_القناة
+  const TURNSTILE_SITE_KEY = '';  // اختياري: المفتاح العام لـ Cloudflare Turnstile. إن تُرك فارغاً يُستخدم سؤال حسابي بسيط.
+
+  let shownGame = null, cfToken = '', cfWidget = null, tsLoading = false, mathAns = 0;
+  [['btn-discord', DISCORD_URL], ['btn-telegram', TELEGRAM_URL]].forEach(([id, url]) => {
+    if (url) { $(id).href = url; $(id).hidden = false; }
+  });
+
+  const dlg = $('report-dialog');
+  const rmsg = t => { $('r-msg').textContent = t; };
+  const reported = () => { try { return JSON.parse(localStorage.getItem('myReports') || '{}'); } catch (e) { return {}; } };
+
+  function newChallenge() {
+    if (TURNSTILE_SITE_KEY) {
+      $('math-box').hidden = true;
+      const render = () => {
+        cfToken = '';
+        if (cfWidget !== null) turnstile.reset(cfWidget);
+        else cfWidget = turnstile.render('#cf-box', { sitekey: TURNSTILE_SITE_KEY, callback: t => { cfToken = t; }, 'expired-callback': () => { cfToken = ''; } });
+      };
+      if (window.turnstile) render();
+      else if (!tsLoading) {
+        tsLoading = true;
+        const sc = document.createElement('script');
+        sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+        sc.onload = render;
+        document.head.appendChild(sc);
+      }
+    } else {
+      $('math-box').hidden = false;
+      const a = 2 + Math.floor(Math.random() * 8), b = 2 + Math.floor(Math.random() * 8);
+      mathAns = a + b;
+      $('math-q').textContent = 'للتأكد أنك لست روبوتاً: كم ناتج ' + a + ' + ' + b + ' ؟';
+      $('r-math').value = '';
+    }
+  }
+
+  $('btn-report').onclick = () => {
+    const g = shownGame;
+    $('r-id').value = g && g.ID ? String(g.ID).trim() : '';
+    $('r-id').readOnly = !!(g && g.ID);
+    $('r-name').textContent = g ? g.Name : 'لم تسحب لعبة بعد، اكتب رقم اللعبة التي تريد التبليغ عنها.';
+    $('r-reason').value = ''; $('r-note').value = ''; $('r-hp').value = '';
+    $('r-send').disabled = false;
+    rmsg('');
+    newChallenge();
+    dlg.showModal();
+  };
+  $('r-cancel').onclick = () => dlg.close();
+  $('r-id').oninput = () => {
+    const g = allProducts.find(p => String(p.ID).trim() === $('r-id').value.trim());
+    $('r-name').textContent = g ? g.Name : '';
+  };
+
+  $('report-form').onsubmit = e => {
+    e.preventDefault();
+    const id = $('r-id').value.trim(), reason = $('r-reason').value;
+    if ($('r-hp').value) { dlg.close(); return; }                      // فخ للروبوتات
+    if (!id) return rmsg('اكتب رقم اللعبة.');
+    if (!reason) return rmsg('اختر سبب التبليغ.');
+    if (TURNSTILE_SITE_KEY ? !cfToken : Number($('r-math').value) !== mathAns) {
+      rmsg(TURNSTILE_SITE_KEY ? 'أكمل التحقق من أنك لست روبوتاً.' : 'إجابة خاطئة، حاول مرة أخرى.');
+      if (!TURNSTILE_SITE_KEY) newChallenge();
+      return;
+    }
+    if (reported()[id]) return rmsg('سبق أن بلّغت عن هذه اللعبة، شكراً لك.');
+    if (!RATINGS_URL) return rmsg('خدمة التبليغ غير مفعّلة بعد.');
+
+    const prod = allProducts.find(p => String(p.ID).trim() === id) || {};
+    const q = { action: 'report', id: id, name: prod.Name || (shownGame && String(shownGame.ID).trim() === id ? shownGame.Name : '') || '',
+                link: prod.Affiliate_Link || '', reason: reason, note: $('r-note').value.trim(), token: cfToken, hp: '' };
+    $('r-send').disabled = true;
+    rmsg('جارٍ الإرسال...');
+    fetch(RATINGS_URL + '?' + Object.keys(q).map(k => k + '=' + encodeURIComponent(q[k])).join('&'))
+      .then(r => r.json())
+      .then(d => {
+        if (!d.ok) throw new Error(d.error || 'fail');
+        try { const v = reported(); v[id] = 1; localStorage.setItem('myReports', JSON.stringify(v)); } catch (e) {}
+        rmsg('تم إرسال البلاغ، شكراً لك!');
+        setTimeout(() => dlg.close(), 1500);
+      })
+      .catch(() => { rmsg('تعذّر الإرسال، حاول لاحقاً.'); $('r-send').disabled = false; newChallenge(); });
+  };
 </script>
 </body>
 </html>
