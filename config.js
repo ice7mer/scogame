@@ -1,9 +1,9 @@
 /* ===== إعدادات الموقع: عدّل هنا فقط ===== */
 const CONFIG = {
-  sheetCsvUrl: "",          // رابط الورقة الأولى في الشيت: ملف > مشاركة > نشر على الويب > CSV
-  apiUrl: "",               // رابط Web app من Apps Script (التقييم والتبليغ) - انظر Web.gs
+  sheetCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQMUut0z36t7-9ar6TstR2okLwwykQnvKSegRUPYNJYgAd-NbPA1Cw_sfjjo7vJeOEF30B6jVeTbVCH/pubhtml?gid=0&single=true",          // رابط الورقة الأولى في الشيت: ملف > مشاركة > نشر على الويب > CSV
+  apiUrl: "https://script.google.com/macros/s/AKfycbzzvsMHzpPS2E_RsDcJpx-NAK0EJIwJYpScs_LeYWcXYbXZlqe9T_2vadlkYbQe3uYL/exec",               // رابط Web app من Apps Script (التقييم والتبليغ) - انظر Web.gs
   turnstileSiteKey: "0x4AAAAAAF5zsn40p17VlfTU", // مفتاح Cloudflare Turnstile (أضف نطاق موقعك إليه في Cloudflare)
-  youtubeSiteUrl: "https://ice7mer.github.io/scogame/",
+  youtubeSiteUrl: "https://yt-scogame.onrender.com/",
   // يسار: اسم داخلي (لا تغيّره)، يمين: عنوان العمود في الشيت
   columns: { id:"ID", title:"Name", image:"Image_URL", category:"Category", age:"Age", description:"Description", url:"Affiliate_Link", rating:"Rating", date:"Date" },
   // ===== روابط التواصل: ضع الرابط بين علامتي الاقتباس (الفارغ لا يعمل) =====
