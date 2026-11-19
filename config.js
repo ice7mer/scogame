@@ -1,6 +1,6 @@
 /* ===== إعدادات الموقع: عدّل هنا فقط ===== */
 const CONFIG = {
-  sheetCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQMUut0z36t7-9ar6TstR2okLwwykQnvKSegRUPYNJYgAd-NbPA1Cw_sfjjo7vJeOEF30B6jVeTbVCH/pubhtml?gid=0&single=true",          // رابط الورقة الأولى في الشيت: ملف > مشاركة > نشر على الويب > CSV
+  sheetCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQMUut0z36t7-9ar6TstR2okLwwykQnvKSegRUPYNJYgAd-NbPA1Cw_sfjjo7vJeOEF30B6jVeTbVCH/pub?gid=0&single=true&output=csv",          // رابط الورقة الأولى في الشيت: ملف > مشاركة > نشر على الويب > CSV
   apiUrl: "https://script.google.com/macros/s/AKfycbyIXhTOZDJ5A6XDSCUJNYcUZbgeUBb4iDCspX-riAPsRBSvhTSCRWSsS6DC1pukLzpj/exec",               // رابط Web app من Apps Script (التقييم والتبليغ) - انظر Web.gs
   turnstileSiteKey: "0x4AAAAAAGIwyUVv__q6ZjZf", // مفتاح Cloudflare Turnstile (أضف نطاق موقعك إليه في Cloudflare)
   youtubeSiteUrl: "https://yt-scogame.onrender.com/",
